@@ -42,5 +42,24 @@
 				Console.ForegroundColor = currentForegroundColor;
 			}
 		}
+		public static void PrintHeader(string title)
+		{
+			ConsoleColor currentForegroundColor = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Cyan;
+
+			for (int i = 0; i < 50; i++)
+			{
+				Console.Write('=');
+			}
+
+			Console.Write($" {title} ");
+
+			for (int i = 0; i < 50; i++)
+			{
+				Console.Write('=');
+			}
+			Console.WriteLine();
+			Console.ForegroundColor = currentForegroundColor;
+		}
 	}
 }
