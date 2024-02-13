@@ -1,62 +1,92 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using static SCI_Logger.Logging;
+﻿using System.Linq;
 
 namespace SCI_Logger
 {
+	/// <summary>
+	/// Primary logger system for SCI projects
+	/// </summary>
 	public class Logging
 	{
-		public static bool IsDebugEnabled = false;
-		public static readonly string VERSION = "v1.3e";
+		private static bool isDebugEnabled = false;
 
+		/// <summary>
+		/// Version of the Logger
+		/// </summary>
+		public static readonly string VERSION = "v1.7c";
+
+		/// <summary>
+		/// LogLevels
+		/// </summary>
 		public enum LogLevel
 		{
-			DEBUG,
 			INFO,
 			WARN,
-			ERROR
+			ERROR,
+			DEBUG,
 		}
+
+		/// <summary>
+		/// Set Debug mode on or off
+		/// </summary>
+		/// <param name="setDebugEnable"></param>
+		/// <returns>True if Debug is enabled</returns>
+		public static bool SelectDebugMode(bool setDebugEnable)
+		{
+			if (setDebugEnable)
+				isDebugEnabled = true;
+			else if (isDebugEnabled)
+				isDebugEnabled = false;
+			return isDebugEnabled;
+		}
+
+		/// <summary>
+		/// Gets current time for data logging
+		/// </summary>
+		/// <returns></returns>
 		private static string GetCurrentTime()
 		{
 			return DateTime.Now.ToString("HH:mm:ss");
 		}
+
 		private static void WriteInLogFile(LogLevel logLevel, string message)
 		{
 			
-			string pathToLogFile = "./latest.log";
+			string pathToLogFile = "latest.log";
 			try
 			{
 				if (!File.Exists(pathToLogFile))
 				{
-					File.WriteAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}");
+					File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}" + Environment.NewLine);
 					return;
 				}
 				else
 				{
-					File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}");
+					File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}" + Environment.NewLine);
 				}
 			}
 			catch (Exception ex)
 			{
-				Log(LogLevel.ERROR, ex.Message);
+				Console.WriteLine($"[Logger Error]\t{ex.Message}");
 			}
 		}
-		
 
+		/// <summary>
+		/// Logs a message with loglevel
+		/// </summary>
+		/// <param name="logLevel"></param>
+		/// <param name="message"></param>
 		public static void Log(LogLevel logLevel, string message)
 		{
 			ConsoleColor currentForegroundColor = Console.ForegroundColor;
 			
 			// If empty, skip logging
 			if (message == string.Empty)
-			{
 				return;
-			}
 
 			switch (logLevel)
 			{
 				case LogLevel.DEBUG:
-					if (!IsDebugEnabled)
+					if (!isDebugEnabled)
 						return;
 					Console.ForegroundColor = ConsoleColor.Cyan;
 					break;
@@ -77,88 +107,6 @@ namespace SCI_Logger
 			WriteInLogFile(logLevel, message);
 		}
 
-		/// <summary>
-		/// Log an info message
-		/// </summary>
-		/// <param name="message"></param>
-		[Obsolete("Methode is deprecated. Use Log instead.")]
-		public static void Info(string message)
-		{
-			if (message == string.Empty)
-			{
-				return;
-			}
-			ConsoleColor currentForegroundColor = Console.ForegroundColor;
-			Console.ForegroundColor = ConsoleColor.Green;
-
-			Console.WriteLine($"[Info:{GetCurrentTime()}]\t\t{message}");
-
-			Console.ForegroundColor = currentForegroundColor;
-			WriteInLogFile(LogLevel.INFO, message);
-		}
-
-		/// <summary>
-		/// Log an error message
-		/// </summary>
-		/// <param name="message"></param>
-		[Obsolete("Methode is deprecated. Use Log instead.")]
-		public static void Error(string message)
-		{
-			if (message == string.Empty)
-			{
-				return;
-			}
-			ConsoleColor currentForegroundColor = Console.ForegroundColor;
-			Console.ForegroundColor = ConsoleColor.Red;
-
-			Console.WriteLine($"[Error:{GetCurrentTime()}]\t\t{message}");
-
-			Console.ForegroundColor = currentForegroundColor;
-			WriteInLogFile(LogLevel.ERROR, message);
-		}
-
-		/// <summary>
-		/// Log a warn message
-		/// </summary>
-		/// <param name="message"></param>
-		[Obsolete("Methode is deprecated. Use Log instead.")]
-		public static void Warn(string message)
-		{
-			if (message == string.Empty)
-			{
-				return;
-			}
-			ConsoleColor currentForegroundColor = Console.ForegroundColor;
-			Console.ForegroundColor = ConsoleColor.Yellow;
-
-			Console.WriteLine($"[Warning:{GetCurrentTime()}]\t\t{message}");
-
-			Console.ForegroundColor = currentForegroundColor;
-			WriteInLogFile(LogLevel.WARN, message);
-		}
-
-		/// <summary>
-		/// Log a debug message
-		/// </summary>
-		/// <param name="message"></param>
-		[Obsolete("Methode is deprecated. Use Log instead.")]
-		public static void Debug(string message)
-		{
-			if (message == string.Empty)
-			{
-				return;
-			}
-			if (IsDebugEnabled)
-			{
-				ConsoleColor currentForegroundColor = Console.ForegroundColor;
-				Console.ForegroundColor = ConsoleColor.Cyan;
-
-				Console.WriteLine($"[Debug:{GetCurrentTime()}]\t\t{message}");
-
-				Console.ForegroundColor = currentForegroundColor;
-				WriteInLogFile(LogLevel.DEBUG, message);
-			}
-		}
 		public static void PrintHeader(string title)
 		{
 			ConsoleColor currentForegroundColor = Console.ForegroundColor;

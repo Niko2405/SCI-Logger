@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <Copyright>Niko2405</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Title>SCI-Logger</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
