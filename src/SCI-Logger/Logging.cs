@@ -1,18 +1,16 @@
-﻿using System.Linq;
-
-namespace SCI_Logger
+﻿namespace SCI_Logger
 {
 	/// <summary>
 	/// Primary logger system for SCI projects
 	/// </summary>
 	public class Logging
 	{
-		private static bool isDebugEnabled = false;
+		private static bool _isDebugEnabled = false;
 
 		/// <summary>
 		/// Version of the Logger
 		/// </summary>
-		public static readonly string VERSION = "v1.7c";
+		public static readonly string VERSION = "v1.8b";
 
 		/// <summary>
 		/// LogLevels
@@ -30,13 +28,16 @@ namespace SCI_Logger
 		/// </summary>
 		/// <param name="setDebugEnable"></param>
 		/// <returns>True if Debug is enabled</returns>
-		public static bool SelectDebugMode(bool setDebugEnable)
+		public static bool DebugEnabled
 		{
-			if (setDebugEnable)
-				isDebugEnabled = true;
-			else if (isDebugEnabled)
-				isDebugEnabled = false;
-			return isDebugEnabled;
+			get
+			{
+				return _isDebugEnabled;
+			}
+			set
+			{
+				_isDebugEnabled = value;
+			}
 		}
 
 		/// <summary>
@@ -54,15 +55,7 @@ namespace SCI_Logger
 			string pathToLogFile = "latest.log";
 			try
 			{
-				if (!File.Exists(pathToLogFile))
-				{
-					File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}" + Environment.NewLine);
-					return;
-				}
-				else
-				{
-					File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}" + Environment.NewLine);
-				}
+				File.AppendAllText(pathToLogFile, $"[{GetCurrentTime()}] [{logLevel}]:\t{message}" + Environment.NewLine);
 			}
 			catch (Exception ex)
 			{
@@ -75,7 +68,7 @@ namespace SCI_Logger
 		/// </summary>
 		/// <param name="logLevel"></param>
 		/// <param name="message"></param>
-		public static void Log(LogLevel logLevel, string message)
+		public static void Log(LogLevel logLevel, string message, bool WriteInFile=true)
 		{
 			ConsoleColor currentForegroundColor = Console.ForegroundColor;
 			
@@ -86,7 +79,7 @@ namespace SCI_Logger
 			switch (logLevel)
 			{
 				case LogLevel.DEBUG:
-					if (!isDebugEnabled)
+					if (!DebugEnabled)
 						return;
 					Console.ForegroundColor = ConsoleColor.Cyan;
 					break;
@@ -104,22 +97,33 @@ namespace SCI_Logger
 			}
 			Console.WriteLine($"[{GetCurrentTime()}] [{logLevel}]:\t{message}");
 			Console.ForegroundColor = currentForegroundColor;
-			WriteInLogFile(logLevel, message);
+			if (WriteInFile)
+			{
+				WriteInLogFile(logLevel, message);
+			}
 		}
 
+		/// <summary>
+		/// Print a header with a title
+		/// </summary>
+		/// <param name="title"></param>
 		public static void PrintHeader(string title)
 		{
+			
+			short x = (short)Console.WindowWidth;
+			short titleLenght = (short)title.Length;
+
 			ConsoleColor currentForegroundColor = Console.ForegroundColor;
 			Console.ForegroundColor = ConsoleColor.Cyan;
 
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < (x / 2) - (titleLenght / 2) - 1; i++)
 			{
 				Console.Write('=');
 			}
 
 			Console.Write($" {title} ");
 
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < (x / 2) - (titleLenght / 2) - 1; i++)
 			{
 				Console.Write('=');
 			}
